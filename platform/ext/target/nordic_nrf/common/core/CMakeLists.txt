@@ -29,6 +29,9 @@ if((NRF_SOC_VARIANT STREQUAL nrf54l15) OR (TFM_PLATFORM STREQUAL "nordic_nrf/nrf
   # variables keep changing so we check both to be future proof
   set(HAS_RRAMC 1)
   set(HAS_CRACEN 1)
+elseif((NRF_SOC_VARIANT STREQUAL nrf7120_enga) OR (PSA_API_TEST_TARGET STREQUAL nrf7120_enga))
+  set(HAS_MRAMC 1)
+  set(HAS_CRACEN 1)
 else()
   set(HAS_NVMC 1)
   set(HAS_CRACEN 0)
@@ -85,6 +88,10 @@ set(nvm_sources
 if(HAS_RRAMC)
   list(APPEND nvm_sources
     ${HAL_NORDIC_PATH}/nrfx/drivers/src/nrfx_rramc.c
+  )
+elseif(HAS_MRAMC)
+  list(APPEND nvm_sources
+    ${HAL_NORDIC_PATH}/nrfx/drivers/src/nrfx_mramc.c
   )
 elseif(HAS_NVMC)
   list(APPEND nvm_sources

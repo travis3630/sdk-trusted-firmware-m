@@ -39,6 +39,13 @@
 #define WRITE_BUFFER_SIZE 0
 #endif
 
+#elif defined(NRF_MRAMC_S)
+
+#include <nrfx_mramc.h>
+
+// MRAMC implementation
+// Modify code here
+
 #else
 #error "Unrecognized platform"
 #endif
@@ -123,7 +130,12 @@ static int32_t ARM_Flash_Initialize(ARM_Flash_SignalEvent_t cb_event)
 	if(err != NRFX_SUCCESS && err != NRFX_ERROR_ALREADY) {
 		return err;
 	}
-#endif /* RRAMC_PRESENT */
+#elif defined(MRAMC_PRESENT)
+
+// MRAMC implementation
+// Modify code here
+
+#endif /* RRAMC_PRESENT or MRAMC_PRESENT */
     return ARM_DRIVER_OK;
 }
 
@@ -166,7 +178,7 @@ static int32_t ARM_Flash_ProgramData(uint32_t addr, const void *data,
 
 #ifdef NRF_NVMC_S
     nrfx_nvmc_words_write(addr, data, cnt);
-#else
+#elif defined(NRF_RRAM_S)
 	nrf_rramc_config_t rramc_config;
 	nrf_rramc_config_get(NRF_RRAMC, &rramc_config);
 	const nrf_rramc_config_t orig_rramc_config = rramc_config;
@@ -176,6 +188,9 @@ static int32_t ARM_Flash_ProgramData(uint32_t addr, const void *data,
 	nrfx_rramc_words_write(addr, data, cnt);
 
 	nrf_rramc_config_set(NRF_RRAMC, &orig_rramc_config);
+#elif defined(NRF_MRAM_S)
+    // MRAMC implementation
+    // Modify code here
 #endif
 
     return cnt;

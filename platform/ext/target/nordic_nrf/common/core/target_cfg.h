@@ -54,7 +54,7 @@
 /* Only UART20 and UART30 are supported for TF-M tests, which are the
  * Non-secure applications build via the TF-M build system
  */
-#ifdef NRF54L15_XXAA
+#if defined(NRF54L15_XXAA) || defined(NRF7120_ENGA_XXAA)
 #if NRF_SECURE_UART_INSTANCE == 20
 #define NS_DRIVER_STDIO     Driver_USART30
 #else

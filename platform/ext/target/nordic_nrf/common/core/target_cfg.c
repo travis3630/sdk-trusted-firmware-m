@@ -79,6 +79,17 @@
  * declare its prototype here.
  */
 int nordicsemi_nrf54l_init(void);
+
+#elif defined(NRF7120_ENGA_XXAA)
+/* On nRF54L15 XL1 and XL2 are(P1.00) and XL2(P1.01) */ // Modify code here or not
+#define PIN_XL1 32
+#define PIN_XL2 33
+
+/* During TF-M system initialization we invoke a function that comes
+ * from Zephyr. This function does not have a header file so we
+ * declare its prototype here.
+ */
+int soc_early_init_hook(void);
 #endif
 
 #if TFM_PERIPHERAL_DCNF_SECURE
@@ -836,7 +847,7 @@ enum tfm_plat_err_t init_debug(void)
     }
 #endif
 
-#elif defined(NRF91_SERIES) || defined(NRF54L15_XXAA)
+#elif defined(NRF91_SERIES) || defined(NRF54L15_XXAA) || defined(NRF7120_ENGA_XXAA)
 
 #if !defined(DAUTH_CHIP_DEFAULT)
 #error "Debug access on this platform can only be configured by programming the corresponding registers in UICR."
@@ -942,7 +953,7 @@ void sau_and_idau_cfg(void)
 	 * (53/91) and new (54++) platforms. New platforms have a proper SAU
 	 * and IDAU, whereas old platforms do not.
 	 */
-#ifdef NRF54L15_XXAA
+#if defined (NRF54L15_XXAA) || defined(NRF7120_XXAA)
 	/*
 	 * This SAU configuration aligns with ARM's RSS implementation of
 	 * sau_and_idau_cfg when possible.
@@ -1247,7 +1258,7 @@ static void dppi_channel_configuration(void)
 enum tfm_plat_err_t spu_periph_init_cfg(void)
 {
     /* Peripheral configuration */
-#ifdef NRF54L15_XXAA
+#if defined(NRF54L15_XXAA) || defined(NRF7120_ENGA_XXAA)
 	/* Configure features to be non-secure */
 
 	/*
@@ -1318,7 +1329,7 @@ enum tfm_plat_err_t spu_periph_init_cfg(void)
 	 * have the same security configuration.
 	 */
 	spu_peripheral_config_secure(NRF_REGULATORS_S_BASE, SPU_LOCK_CONF_LOCKED);
-#else /* NRF54L15_XXAA */
+#else /* NRF54L15_XXAA || NRF7120_ENGA_XXAA */
 static const uint32_t target_peripherals[] = {
     /* The following peripherals share ID:
      * - FPU (FPU cannot be configured in NRF91 series, it's always NS)
@@ -1495,7 +1506,7 @@ static const uint32_t target_peripherals[] = {
         spu_peripheral_config_non_secure(target_peripherals[i], SPU_LOCK_CONF_UNLOCKED);
     }
 
-#endif /* NRF54L15_XXAA */
+#endif /* NRF54L15_XXAA || NRF7120_ENGA_XXAA */
 
     /* DPPI channel configuration */
 	dppi_channel_configuration();
@@ -1554,8 +1565,8 @@ static const uint32_t target_peripherals[] = {
     nrf_gpio_pin_control_select(PIN_XL1, NRF_GPIO_PIN_SEL_PERIPHERAL);
     nrf_gpio_pin_control_select(PIN_XL2, NRF_GPIO_PIN_SEL_PERIPHERAL);
 #endif /* NRF53_SERIES */
-#ifdef NRF54L15_XXAA
-    /* NRF54L has a different define */
+#if defined(NRF54L15_XXAA) || defined(NRF7120_ENGA_XXAA)
+    /* NRF54L has a different define */ // What to do for NRF7120_ENGA??
     nrf_gpio_pin_control_select(PIN_XL1, NRF_GPIO_PIN_SEL_GPIO);
     nrf_gpio_pin_control_select(PIN_XL2, NRF_GPIO_PIN_SEL_GPIO);
 #endif
@@ -1613,6 +1624,13 @@ static const uint32_t target_peripherals[] = {
 #ifdef NRF54L15_XXAA
 	/* SOC configuration from Zephyr's soc.c. */
 	int soc_err = nordicsemi_nrf54l_init();
+	if (soc_err) {
+		return soc_err;
+	}
+
+#elif defined(NRF7120_ENGA_XXAA)
+    /* SOC configuration from Zephyr's soc.c. */
+	int soc_err = soc_early_init_hook();
 	if (soc_err) {
 		return soc_err;
 	}
