@@ -56,7 +56,7 @@
 #ifdef PSA_API_TEST_IPC
 /* Firmware Framework test suites */
 #define FLASH_S_PARTITION_SIZE                (0x48000)       /* S partition: 288 kB*/
-#define FLASH_NS_PARTITION_SIZE               (0x28000)       /* NS partition: 160 kB*/fnbjasvh\svhsfuh
+#define FLASH_NS_PARTITION_SIZE               (0x28000)       /* NS partition: 160 kB*/
 #else
 #define FLASH_S_PARTITION_SIZE                (0x40000)       /* S partition: 256 kB*/
 #define FLASH_NS_PARTITION_SIZE               (0x30000)       /* NS partition: 192 kB*/
