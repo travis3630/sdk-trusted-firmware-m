@@ -223,11 +223,43 @@ enum tfm_plat_err_t nrf_mpc_init_cfg(void)
 		init_mpc_region_override(&override);
 
 		override.start_address = memory_regions.non_secure_partition_base;
-		override.endaddr = NRF_UICR_S_BASE;
+		override.endaddr = memory_regions.non_secure_partition_limit;
 		override.index = index_mpc00++;
 
 		mpc_configure_override(NRF_MPC00, &override);
 	}
+
+#ifdef NRF_NS_SECONDARY
+	{
+		struct mpc_region_override override;
+
+		init_mpc_region_override(&override);
+
+		override.start_address = memory_regions.secondary_partition_base;
+		override.endaddr = memory_regions.secondary_partition_limit;
+		override.index = index_mpc00++;
+
+		mpc_configure_override(NRF_MPC00, &override);
+	}
+#endif /* NRF_NS_SECONDARY */
+
+#ifdef NRF_NS_STORAGE_PARTITION_START
+	{
+		struct mpc_region_override override;
+
+		init_mpc_region_override(&override);
+
+		/* Used to be: 
+		 *      override.start_address = memory_regions.non_secure_storage_partition_base;
+		 * But our NS start from Wi-Fi patch area
+		 */
+		override.start_address = 0x002E0000;  // Starting from Wi-Fi patch area
+		override.endaddr = memory_regions.non_secure_storage_partition_limit;
+		override.index = index_mpc00++;
+
+		mpc_configure_override(NRF_MPC00, &override);
+	}
+#endif /* NRF_NS_STORAGE_PARTITION_START */
 
 	/* Configure the non-secure partition of the volatile memory */
 	{
